@@ -1,7 +1,10 @@
+"use client";
 import React from "react";
 import Logout from "./logout";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
+  const { user } = useAuth();
   return (
     <nav className="bg-gray-800 sticky top-0 p-4 flex items-center justify-between">
       {/* Logo */}
@@ -24,9 +27,7 @@ export default function Navbar() {
       </div>
 
       {/* Logout Button */}
-      <div>
-        <Logout></Logout>
-      </div>
+      <div>{user && <Logout></Logout>}</div>
     </nav>
   );
 }
