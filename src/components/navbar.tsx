@@ -18,10 +18,13 @@ export default function Navbar() {
 
       {/* Navigation Links */}
       <div className="flex space-x-8">
-        <a href="/" className="text-gray-300 hover:text-white">
+        <a
+          href="https://www.encidemace.xyz/"
+          className="text-gray-300 hover:text-white"
+        >
           Home
         </a>
-        <a href="/contact" className="text-gray-300 hover:text-white">
+        <a href="" className="text-gray-300 hover:text-white">
           Contact
         </a>
       </div>
