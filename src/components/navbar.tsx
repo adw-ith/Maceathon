@@ -6,8 +6,11 @@ export default function Navbar() {
     <nav className="bg-gray-800 sticky top-0 p-4 flex items-center justify-between">
       {/* Logo */}
       <div className="text-white font-bold text-lg">
-        <img src="/logo.png" alt="Logo" className="h-8 inline-block mr-2" />
-        MyApp
+        <img
+          src="https://encode.encidemace.xyz/images/encide_logo-removebg-preview.png"
+          alt="Logo"
+          className="h-8 inline-block mr-2"
+        />
       </div>
 
       {/* Navigation Links */}

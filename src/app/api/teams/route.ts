@@ -19,16 +19,7 @@ export async function POST(req: any) {
       teamMembers,
       fileUrl, // This is the URL of the uploaded file
     } = await req.json();
-    //console log all the above variables with ndicating each variable for example3 console.log("teamName", teamName)
 
-    console.log("teamName:", teamName);
-    console.log("teamLeaderName:", teamLeaderName);
-    console.log("phoneNumber:", phoneNumber);
-    console.log("email:", email);
-    console.log("domainSelected:", domainSelected);
-    console.log("problemStatement:", problemStatement);
-    console.log("teamMembers:", teamMembers);
-    console.log("fileUrl:", fileUrl);
     const newTeam = {
       teamName,
       teamLeaderName,

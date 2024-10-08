@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
+import Loading from "@/components/loading";
 
 const UnProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -16,7 +17,7 @@ const UnProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   }, [user, loading, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (user) {
