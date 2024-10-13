@@ -16,11 +16,11 @@ const UploadForm = () => {
   const [load, setLoad] = useState<boolean>(false);
   const [submit, setSubmit] = useState<boolean>(false);
   const { user } = useAuth();
+  const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
   useEffect(() => {
     const checkEmailExists = async () => {
       try {
-        console.log(user?.email);
         const response = await fetch("/api/check", {
           method: "POST",
           headers: {
@@ -30,29 +30,22 @@ const UploadForm = () => {
         });
 
         const data = await response.json();
-        if (data.exists) {
-          setSubmit(true);
-        } else {
-          setSubmit(false);
-        }
+        setSubmit(data.exists);
       } catch (err) {
         console.error("Error checking email:", err);
-      } finally {
       }
     };
 
     checkEmailExists();
-  }, []);
+  }, [user?.email]);
 
-  // New state variables for the added fields
+  // State variables for form fields
   const [teamName, setTeamName] = useState("");
   const [teamLeaderName, setTeamLeaderName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [domainSelected, setDomainSelected] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
-
-  // State for number of team members and details of team members
   const [numOfMembers, setNumOfMembers] = useState(0);
   const [teamMembers, setTeamMembers] = useState([
     { name: "", phoneNumber: "" },
@@ -64,7 +57,8 @@ const UploadForm = () => {
     if (user && user.email) {
       setEmail(user.email);
     }
-  }, []);
+  }, [user]);
+
   const types = [
     "image/png",
     "image/jpeg",
@@ -76,13 +70,19 @@ const UploadForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? e.target.files[0] : null;
     if (selected && types.includes(selected.type)) {
-      setFile(selected);
-      setError("");
+      if (selected.size > MAX_FILE_SIZE) {
+        setError("File size exceeds 3MB limit. Please select a smaller file.");
+        setFile(null);
+      } else {
+        setFile(selected);
+        setError("");
+      }
     } else {
       setFile(null);
       setError("Please select a valid file (png, jpeg, pdf)");
     }
   };
+
   const handleUpload = async () => {
     setLoad(true);
     if (file) {
@@ -92,16 +92,13 @@ const UploadForm = () => {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          // Optionally, you can track upload progress here
+          // Optionally, track upload progress
         },
         (error) => {
           setError(error.message);
         },
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
-          console.log("File uploaded and available at:", url);
-
-          // Prepare the data to send to the API
           const teamData = {
             teamName,
             teamLeaderName,
@@ -110,12 +107,10 @@ const UploadForm = () => {
             domainSelected,
             problemStatement,
             teamMembers: teamMembers.slice(0, numOfMembers),
-            fileUrl: url, // Include the uploaded file URL
+            fileUrl: url, // Uploaded file URL
           };
 
-          // Submit the form data to the API
           try {
-            console.log(teamData);
             const response = await fetch("/api/teams", {
               method: "POST",
               headers: {
@@ -141,7 +136,6 @@ const UploadForm = () => {
     setLoad(false);
   };
 
-  // Handle change for team members input
   const handleTeamMemberChange = (
     index: number,
     field: string,
@@ -212,7 +206,6 @@ const UploadForm = () => {
               <option value={3}>3</option>
             </select>
           </div>
-          {/* Conditionally render team member input fields */}
           {Array.from({ length: numOfMembers }, (_, index) => (
             <div
               key={index}
@@ -238,6 +231,11 @@ const UploadForm = () => {
               />
             </div>
           ))}
+          <div className="w-full text-left">
+            <label className="text-sm text-gray-400">
+              Max file size: 3MB (png, jpeg, pdf, ppt, pptx)
+            </label>
+          </div>
           <input
             type="file"
             onChange={handleChange}
@@ -245,25 +243,20 @@ const UploadForm = () => {
           />
           <button
             type="button"
-            disabled={load} // Correctly setting the disabled attribute based on the load state
+            disabled={load}
             className={`bg-blue-500 px-4 p-2 rounded-md ${
               load ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-900"
             } duration-300 mt-4`}
             onClick={handleUpload}
           >
-            {load ? "Loading..." : "Submit"}{" "}
-            {/* Change button text based on loading state */}
+            {load ? <Loading /> : "Submit"}
           </button>
-
-          <div className="output">
-            {error && <div className="error text-red-500">{error}</div>}
-            {file && <div>{file.name}</div>}
-          </div>
+          {error && <p className="text-red-600">{error}</p>}
         </form>
       )}
       {submit && (
-        <div className="bg-slate-900 min-h-screen flex flex-col p-8 justify-center text-white items-center space-y-4">
-          Successfully submitted your response
+        <div className="text-white text-center mt-10 px-8">
+          <h1>successfully submitted!</h1>
         </div>
       )}
     </div>
